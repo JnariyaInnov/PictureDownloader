@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PictureDownloader extends Activity {
 
+    public static final String TAG = "PictureDownloader";
     private static final String DEFAULT_PROTOCOL = "http://";
 
     private ImageView imageView;
@@ -53,28 +55,23 @@ public class PictureDownloader extends Activity {
     public void onDownloadPress(View view) {
 
         try {
-
             URL image = new URL(((EditText) findViewById(R.id.imageUrl)).getText().toString());
-
-            ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-            AsyncTask downloadTask = new DownloadImage(progressBar).execute(image);
-
-            Bitmap bm = null;
+            AsyncTask downloadTask = new DownloadImage(this).execute(image);
 
             try {
-                bm = (Bitmap) downloadTask.get();
+                Bitmap bm = (Bitmap) downloadTask.get();
 
                 if (bm != null) {
                     Bitmap resizedBitmap = getResizedBitmap(bm, imageView.getHeight(), imageView.getWidth());
                     imageView.setImageBitmap(resizedBitmap);
                 } else {
-                    Log.e("archee", "Bitmap object is null");
+                    Log.e(TAG, "Bitmap object is null");
                 }
 
             } catch (InterruptedException e) {
-                Log.e("archee", "Bitmap download failed. " + e.getMessage());
+                Log.e(TAG, "Bitmap download failed. " + e.getMessage());
             } catch (ExecutionException e) {
-                Log.e("archee", "Bitmap download failed. " + e.getMessage());
+                Log.e(TAG, "Bitmap download failed. " + e.getMessage());
             }
 
         } catch (MalformedURLException e) {
@@ -83,12 +80,29 @@ public class PictureDownloader extends Activity {
 
     }
 
+    private Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // Resize the bitmap
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // Recreate the new bitmap
+        return Bitmap.createBitmap(bm, 0, 0, width, height,
+                matrix, false);
+    }
+
     private static class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
 
         private ProgressBar progressBar;
+        private Button downloadButton;
 
-        DownloadImage(ProgressBar progressBar) {
-            this.progressBar = progressBar;
+        DownloadImage(Activity mainActivity) {
+            this.progressBar = (ProgressBar) mainActivity.findViewById(R.id.progressBar);
+            this.downloadButton = (Button) mainActivity.findViewById(R.id.downloadButton);
         }
 
         private Bitmap getBitmapFromURL(URL url) {
@@ -98,10 +112,10 @@ public class PictureDownloader extends Activity {
                 connection.setDoInput(true);
                 connection.connect();
                 InputStream input = connection.getInputStream();
-                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                return myBitmap;
+
+                return BitmapFactory.decodeStream(input);
             } catch (IOException e) {
-                Log.e("archee", "Bitmap download failed. " + e.getMessage());
+                Log.e(TAG, "Bitmap download failed. " + e.getMessage());
                 return null;
             }
         }
@@ -114,6 +128,7 @@ public class PictureDownloader extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            downloadButton.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
         }
 
@@ -121,6 +136,7 @@ public class PictureDownloader extends Activity {
         protected void onPostExecute(Bitmap aBitmap) {
             super.onPostExecute(aBitmap);
             progressBar.setVisibility(View.GONE);
+            downloadButton.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -133,21 +149,4 @@ public class PictureDownloader extends Activity {
             super.onCancelled();
         }
     }
-    private Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // CREATE A MATRIX FOR THE MANIPULATION
-        Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight);
-
-        // "RECREATE" THE NEW BITMAP
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
-                matrix, false);
-
-        return resizedBitmap;
-    }
-
 }

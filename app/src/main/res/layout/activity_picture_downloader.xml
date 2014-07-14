@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/progressBar"
             android:layout_gravity="center_horizontal"
-            android:visibility="invisible"
+            android:visibility="gone"
             android:clickable="false" />
 
         <Button
