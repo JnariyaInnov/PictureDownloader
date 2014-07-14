@@ -22,7 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-import storage.StorageManager;
+import com.archee.picturedownloader.storage.StorageManager;
 
 
 public class PictureDownloader extends Activity {
@@ -30,18 +30,18 @@ public class PictureDownloader extends Activity {
     public static final String TAG = "PictureDownloader";
     private static final String DEFAULT_PROTOCOL = "http://";
 
-    private ImageView imageView;
     private EditText urlEditText;
 
     private boolean displayProtocol;
-    private StorageManager storageManager = StorageManager.getInstance();
+    private StorageManager storageManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_downloader);
 
-        imageView = (ImageView) findViewById(R.id.imageView);
+        // API for persisting data
+        storageManager = StorageManager.getInstance(getApplicationContext());
         urlEditText = (EditText) findViewById(R.id.imageUrl);
         displayProtocol = true;
     }
@@ -59,13 +59,16 @@ public class PictureDownloader extends Activity {
         String imageUrlStr = ((EditText) findViewById(R.id.imageUrl)).getText().toString();
 
         try {
+            // Attempt to download image in a background thread.
             URL imageUrl = new URL(imageUrlStr);
             AsyncTask downloadTask = new DownloadImage(this).execute(imageUrl);
 
             try {
+                // Retrieve downloaded image from background thread, if there is a result.
                 Bitmap bm = (Bitmap) downloadTask.get();
 
                 if (bm != null) {
+                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
                     Bitmap resizedBitmap = getResizedBitmap(bm, imageView.getHeight(), imageView.getWidth());
                     imageView.setImageBitmap(resizedBitmap);
 

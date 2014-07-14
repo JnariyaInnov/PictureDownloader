@@ -1,4 +1,6 @@
-package storage;
+package com.archee.picturedownloader.storage;
+
+import android.content.Context;
 
 import java.util.Date;
 import java.util.List;
@@ -7,6 +9,13 @@ import java.util.List;
  * Created by Archee on 7/13/2014.
  */
 public class DatabaseStorage implements StorageStrategy {
+
+    private Context applicationContext;
+
+    protected DatabaseStorage(Context applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
     @Override
     public List<Entry> getHistory() {
         return null;
@@ -16,4 +25,6 @@ public class DatabaseStorage implements StorageStrategy {
     public void addEntry(String entry, Date now) {
 
     }
+
+
 }

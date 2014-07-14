@@ -1,4 +1,6 @@
-package storage;
+package com.archee.picturedownloader.storage;
+
+import android.content.Context;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +16,7 @@ public class StorageManager {
 
     private static StorageManager instance;
     private StorageStrategy strategy;
+    private Context applicationContext;
 
     public List<Entry> getHistory() {
         return strategy.getHistory();
@@ -23,9 +26,9 @@ public class StorageManager {
         strategy.addEntry(entry, new Date());
     }
 
-    public static StorageManager getInstance() {
+    public static StorageManager getInstance(Context context) {
         if (instance == null) {
-            instance = new StorageManager();
+            instance = new StorageManager(context);
         }
 
         return instance;
@@ -34,17 +37,18 @@ public class StorageManager {
     public void setStorageMethod(int storageMethod) {
         switch (storageMethod) {
             case STORAGE_CACHE:
-                strategy = new CacheStorage();
+                strategy = new CacheStorage(applicationContext);
                 break;
             case STORAGE_DB:
-                strategy = new DatabaseStorage();
+                strategy = new DatabaseStorage(applicationContext);
                 break;
             default:
                 throw new AssertionError("Storage type not supported.");
         }
     }
 
-    private StorageManager() {
+    private StorageManager(Context context) {
+        applicationContext = context;
         setStorageMethod(DEFAULT_STORAGE);
     }
 

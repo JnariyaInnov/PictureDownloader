@@ -1,4 +1,4 @@
-package storage;
+package com.archee.picturedownloader.storage;
 
 import java.util.Date;
 import java.util.List;
