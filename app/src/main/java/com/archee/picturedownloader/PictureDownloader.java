@@ -22,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
+import storage.StorageManager;
+
 
 public class PictureDownloader extends Activity {
 
@@ -32,6 +34,7 @@ public class PictureDownloader extends Activity {
     private EditText urlEditText;
 
     private boolean displayProtocol;
+    private StorageManager storageManager = StorageManager.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +56,11 @@ public class PictureDownloader extends Activity {
     }
 
     public void onDownloadPress(View view) {
+        String imageUrlStr = ((EditText) findViewById(R.id.imageUrl)).getText().toString();
 
         try {
-            URL image = new URL(((EditText) findViewById(R.id.imageUrl)).getText().toString());
-            AsyncTask downloadTask = new DownloadImage(this).execute(image);
+            URL imageUrl = new URL(imageUrlStr);
+            AsyncTask downloadTask = new DownloadImage(this).execute(imageUrl);
 
             try {
                 Bitmap bm = (Bitmap) downloadTask.get();
@@ -64,6 +68,9 @@ public class PictureDownloader extends Activity {
                 if (bm != null) {
                     Bitmap resizedBitmap = getResizedBitmap(bm, imageView.getHeight(), imageView.getWidth());
                     imageView.setImageBitmap(resizedBitmap);
+
+                    storageManager.setStorageMethod(StorageManager.STORAGE_DB);
+                    storageManager.addEntry(imageUrlStr);
                 } else {
                     Log.e(TAG, "Bitmap object is null");
                 }
