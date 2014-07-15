@@ -19,5 +19,5 @@ public interface Storage {
     /*
     * Adds an entry to entry history.
     */
-    void addEntry(String entry, Date now);
+    void addEntry(String url, Date now);
 }
