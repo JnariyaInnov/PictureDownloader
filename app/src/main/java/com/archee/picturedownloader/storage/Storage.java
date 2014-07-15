@@ -6,7 +6,10 @@ import java.util.List;
 /**
  * The top-level strategy interface that specifies methods to be overridden by concrete strategy classes
  */
-public interface StorageStrategy {
+public interface Storage {
+
+    public static final int STORAGE_CACHE = 1;
+    public static final int STORAGE_DB = 2;
 
     /*
     * Retrieves a list of entry history in an ordered manner.

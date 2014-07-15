@@ -20,9 +20,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-import com.archee.picturedownloader.storage.StorageManager;
+import com.archee.picturedownloader.storage.Storage;
+import com.archee.picturedownloader.storage.StorageFactory;
 
 
 public class PictureDownloader extends Activity {
@@ -33,15 +35,16 @@ public class PictureDownloader extends Activity {
     private EditText urlEditText;
 
     private boolean displayProtocol;
-    private StorageManager storageManager;
+    private Storage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_downloader);
 
-        // API for persisting data
-        storageManager = StorageManager.getInstance(getApplicationContext());
+        // Storage object user for persisting data
+        storage = StorageFactory.getInstance(getApplicationContext(), Storage.STORAGE_CACHE);
+
         urlEditText = (EditText) findViewById(R.id.imageUrl);
         displayProtocol = true;
     }
@@ -72,8 +75,7 @@ public class PictureDownloader extends Activity {
                     Bitmap resizedBitmap = getResizedBitmap(bm, imageView.getHeight(), imageView.getWidth());
                     imageView.setImageBitmap(resizedBitmap);
 
-                    storageManager.setStorageMethod(StorageManager.STORAGE_DB);
-                    storageManager.addEntry(imageUrlStr);
+                    storage.addEntry(imageUrlStr, new Date());
                 } else {
                     Log.e(TAG, "Bitmap object is null");
                 }

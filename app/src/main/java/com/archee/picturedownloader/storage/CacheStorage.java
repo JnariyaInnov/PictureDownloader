@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Archee on 7/13/2014.
  */
-public class CacheStorage implements StorageStrategy {
+public class CacheStorage implements Storage {
 
     private List<Entry> history = Lists.newArrayList();
     private Context applicationContext;
