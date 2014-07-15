@@ -3,8 +3,11 @@ package com.archee.picturedownloader.storage;
 import android.content.Context;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.CharSource;
+import com.google.common.io.Files;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +24,8 @@ public class CacheStorage implements Storage {
         // read from cache
 
         File cacheDirectory = applicationContext.getCacheDir();
+
+        CharSource cache = Files.asCharSource(cacheDirectory, Charset.defaultCharset());
 
         return history;
     }
