@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
+import com.archee.picturedownloader.storage.StorageType;
 
 
 public class PictureDownloader extends Activity {
@@ -33,6 +34,9 @@ public class PictureDownloader extends Activity {
     private static final String DEFAULT_PROTOCOL = "http://";
 
     private EditText urlEditText;
+    private ProgressBar progressBar;
+    private Button downloadButton;
+    private ImageView imageView;
 
     private boolean displayProtocol;
     private Storage storage;
@@ -42,10 +46,16 @@ public class PictureDownloader extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_downloader);
 
-        // Storage object user for persisting data
-        storage = StorageFactory.getInstance(getApplicationContext(), Storage.STORAGE_CACHE);
-
+        // Get references to UI components
         urlEditText = (EditText) findViewById(R.id.imageUrl);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        downloadButton = (Button) findViewById(R.id.downloadButton);
+        imageView = (ImageView) findViewById(R.id.imageView);
+
+        // Storage object user for persisting data
+        storage = StorageFactory.getInstance(getApplicationContext(), StorageType.CACHE);
+
+        // Auto-populate the URL protocol in text box when pressed
         displayProtocol = true;
     }
 
@@ -59,7 +69,7 @@ public class PictureDownloader extends Activity {
     }
 
     public void onDownloadPress(View view) {
-        String imageUrlStr = ((EditText) findViewById(R.id.imageUrl)).getText().toString();
+        String imageUrlStr = urlEditText.getText().toString();
 
         try {
             // Attempt to download image in a background thread.
@@ -71,7 +81,6 @@ public class PictureDownloader extends Activity {
                 Bitmap bm = (Bitmap) downloadTask.get();
 
                 if (bm != null) {
-                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
                     Bitmap resizedBitmap = getResizedBitmap(bm, imageView.getHeight(), imageView.getWidth());
                     imageView.setImageBitmap(resizedBitmap);
 
@@ -107,14 +116,13 @@ public class PictureDownloader extends Activity {
                 matrix, false);
     }
 
-    private static class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
+    private class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
 
-        private ProgressBar progressBar;
-        private Button downloadButton;
+
 
         DownloadImage(Activity mainActivity) {
-            this.progressBar = (ProgressBar) mainActivity.findViewById(R.id.progressBar);
-            this.downloadButton = (Button) mainActivity.findViewById(R.id.downloadButton);
+
+
         }
 
         private Bitmap getBitmapFromURL(URL url) {

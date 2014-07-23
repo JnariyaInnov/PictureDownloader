@@ -9,12 +9,12 @@ import java.util.List;
  */
 public class StorageFactory {
 
-    public static Storage getInstance(Context applicationContext, int storageType) {
+    public static Storage getInstance(Context applicationContext, StorageType storageType) {
         switch (storageType) {
-            case Storage.STORAGE_CACHE:
+            case CACHE:
                 return new CacheStorage(applicationContext);
 
-            case Storage.STORAGE_DB:
+            case DATABASE:
                 return new DatabaseStorage(applicationContext);
 
             default:

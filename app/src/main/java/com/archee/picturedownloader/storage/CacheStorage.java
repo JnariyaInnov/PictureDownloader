@@ -1,18 +1,24 @@
 package com.archee.picturedownloader.storage;
 
 import android.content.Context;
+import android.graphics.Picture;
+import android.util.Log;
 
-import com.google.common.base.Charsets;
+import com.archee.picturedownloader.PictureDownloader;
+import com.archee.picturedownloader.utils.DateUtils;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,38 +26,68 @@ import java.util.List;
  */
 public class CacheStorage implements Storage {
 
-    private static final String SEPARATOR = "&";
+    private static final String SEPARATOR = "$";
+    private static final String CACHE_FILE = "entries";
 
     private List<Entry> history = Lists.newArrayList();
-    private Context applicationContext;
+    private File cacheFile;
+
+    protected CacheStorage(Context applicationContext) {
+        cacheFile = new File(applicationContext.getCacheDir(), CACHE_FILE);
+    }
 
     @Override
     public List<Entry> getHistory() {
-        // read from cache
-
-        File cacheDirectory = applicationContext.getCacheDir();
-
         try {
-            List<String> lines = Files.readLines(cacheDirectory, Charsets.UTF_8);
+            CharSource cacheSource = Files.asCharSource(cacheFile, Charset.defaultCharset());
+            List<String> lines = cacheSource.readLines();
 
+            for (String line : lines) {
+                Entry entry = parseEntryFromLine(line);
+
+                if (entry != null) {
+                    history.add(entry);
+                }
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(PictureDownloader.TAG, "There was an error reading from the cache: " + e.getMessage());
         }
-
 
         return history;
     }
 
     @Override
     public void addEntry(String entry, Date now) {
-        // add entry to cache
+        CharSink cacheSink = Files.asCharSink(cacheFile, Charset.defaultCharset());
+
+        try {
+            cacheSink.write(entry + SEPARATOR + DateUtils.DEFAULT_FORMATTER.format(now));
+        } catch (IOException e) {
+            Log.e(PictureDownloader.TAG, "There was an error writing to the cache: " + e.getMessage());
+        }
     }
 
-    private Entry createEntry(String line) {
-        // Solit string to create an entry
+    /**
+     *
+     * @param line A string that is formatted in a way whereas it can be represented as an Entry
+     * @return an Entry object, or null if there is a formatting error.
+     */
+    protected Entry parseEntryFromLine(String line) {
+        Splitter splitter = Splitter.on(SEPARATOR);
+        Iterator<String> it = splitter.split(line).iterator();
+
+        if (it.hasNext()) {
+            String url = it.next();
+            String date = it.next();
+
+            try {
+                return new Entry(url, DateUtils.DEFAULT_FORMATTER.parse(date));
+            } catch (ParseException e) {
+                Log.e(PictureDownloader.TAG, "There was an error parsing the date string: " + date);
+            }
+        }
+
+        return null;
     }
 
-    protected CacheStorage(Context applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 }
