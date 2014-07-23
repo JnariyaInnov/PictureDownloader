@@ -31,13 +31,24 @@
             android:visibility="gone"
             android:clickable="false" />
 
-        <Button
-            android:layout_width="192dp"
-            android:layout_height="wrap_content"
-            android:text="Download!"
-            android:id="@+id/downloadButton"
-            android:layout_gravity="center_horizontal"
-            android:onClick="onDownloadPress"/>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="192dp"
+                android:layout_height="wrap_content"
+                android:text="@string/download"
+                android:id="@+id/downloadButton"
+                android:onClick="onDownloadPress"/>
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/history"
+                android:id="@+id/historyButton"
+                android:onClick="onHistoryPress"/>
+            </LinearLayout>
 
         <ImageView
             android:layout_width="match_parent"

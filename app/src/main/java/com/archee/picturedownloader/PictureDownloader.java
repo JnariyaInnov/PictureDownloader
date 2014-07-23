@@ -21,11 +21,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import com.archee.picturedownloader.storage.Entry;
 import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
 import com.archee.picturedownloader.storage.StorageType;
+import com.archee.picturedownloader.utils.DateUtils;
 
 
 public class PictureDownloader extends Activity {
@@ -74,7 +77,7 @@ public class PictureDownloader extends Activity {
         try {
             // Attempt to download image in a background thread.
             URL imageUrl = new URL(imageUrlStr);
-            AsyncTask downloadTask = new DownloadImage(this).execute(imageUrl);
+            AsyncTask downloadTask = new DownloadImage().execute(imageUrl);
 
             try {
                 // Retrieve downloaded image from background thread, if there is a result.
@@ -101,6 +104,14 @@ public class PictureDownloader extends Activity {
 
     }
 
+    public void onHistoryPress(View view) {
+        List<Entry> history = storage.getHistory();
+
+        for (Entry entry : history) {
+            Log.d(TAG, entry.getUrl() + " - " + DateUtils.DEFAULT_FORMATTER.format(entry.getDate()));
+        }
+    }
+
     private Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
         int width = bm.getWidth();
         int height = bm.getHeight();
@@ -117,13 +128,6 @@ public class PictureDownloader extends Activity {
     }
 
     private class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
-
-
-
-        DownloadImage(Activity mainActivity) {
-
-
-        }
 
         private Bitmap getBitmapFromURL(URL url) {
             try {

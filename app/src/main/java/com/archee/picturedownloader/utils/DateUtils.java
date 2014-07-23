@@ -3,7 +3,7 @@ package com.archee.picturedownloader.utils;
 import java.text.SimpleDateFormat;
 
 /**
- * Created by ericvangeem on 7/23/14.
+ * A utility class to help with parsing and formatting dates.
  */
 public class DateUtils {
 

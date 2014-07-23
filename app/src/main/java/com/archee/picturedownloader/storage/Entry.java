@@ -3,7 +3,7 @@ package com.archee.picturedownloader.storage;
 import java.util.Date;
 
 /**
- * Created by Archee on 7/13/2014.
+ * A POJO to represent a single entry.
  */
 public class Entry {
     private String url;
