@@ -1,6 +1,7 @@
 package com.archee.picturedownloader;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -29,11 +31,15 @@ import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
 import com.archee.picturedownloader.storage.StorageType;
 import com.archee.picturedownloader.utils.DateUtils;
+import com.archee.picturedownloader.views.ListViewActivity;
 
 
 public class PictureDownloader extends Activity {
 
     public static final String TAG = "PictureDownloader";
+    public static final String EXTRA_HISTORY = "com.archee.picturedownloader.HISTORY";
+    public static final String EXTRA_URL = "com.archee.picturedownloader.URL";
+
     private static final String DEFAULT_PROTOCOL = "http://";
 
     private EditText urlEditText;
@@ -61,6 +67,7 @@ public class PictureDownloader extends Activity {
         // Auto-populate the URL protocol in text box when pressed
         displayProtocol = true;
     }
+
 
     public void setDefaultProtocol(View view) {
         if (displayProtocol) {
@@ -107,8 +114,32 @@ public class PictureDownloader extends Activity {
     public void onHistoryPress(View view) {
         List<Entry> history = storage.getHistory();
 
-        for (Entry entry : history) {
-            Log.d(TAG, entry.getUrl() + " - " + DateUtils.DEFAULT_FORMATTER.format(entry.getDate()));
+        if (!history.isEmpty()) {
+            // Convert history List to ArrayList so we can pass it in the intent.
+            ArrayList<Entry> historyArrayList = new ArrayList<Entry>();
+            historyArrayList.addAll(history);
+
+            // Create intent with history list and pass it to ListViewActivity
+            Intent intent = new Intent(this, ListViewActivity.class);
+            intent.putParcelableArrayListExtra(PictureDownloader.EXTRA_HISTORY, historyArrayList);
+            startActivityForResult(intent, 1);
+
+            for (Entry entry : history) {
+                Log.d(TAG, entry.getUrl() + " - " + DateUtils.DEFAULT_FORMATTER.format(entry.getDate()));
+            }
+        } else {
+            Toast.makeText(this, "There is no history", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            String url = data.getStringExtra(PictureDownloader.EXTRA_URL);
+            urlEditText.setText(url);
+            displayProtocol = false;
         }
     }
 

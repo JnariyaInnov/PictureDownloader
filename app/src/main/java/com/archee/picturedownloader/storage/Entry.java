@@ -1,11 +1,20 @@
 package com.archee.picturedownloader.storage;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
+import com.archee.picturedownloader.PictureDownloader;
+import com.archee.picturedownloader.utils.DateUtils;
+
+import java.text.ParseException;
 import java.util.Date;
 
 /**
- * A POJO to represent a single entry.
+ * A parcel object to represent a single entry.
  */
-public class Entry {
+public class Entry implements Parcelable {
+
     private String url;
     private Date date;
 
@@ -21,4 +30,45 @@ public class Entry {
     public Date getDate() {
         return date;
     }
+
+    @Override
+    public String toString() {
+        return url;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[] {
+                this.url,
+                DateUtils.DEFAULT_FORMATTER.format(this.date)
+        });
+    }
+
+    public static final Parcelable.Creator<Entry> CREATOR = new Creator<Entry>() {
+        @Override
+        public Entry createFromParcel(Parcel source) {
+            String[] data = new String[2];
+            source.readStringArray(data);
+            String url = data[0];
+            Date d = null;
+
+            try {
+                d = DateUtils.DEFAULT_FORMATTER.parse(data[1]);
+            } catch (ParseException e) {
+                Log.e(PictureDownloader.TAG, "There was a parsing error. " + e.getMessage());
+            }
+
+            return new Entry(url, d);
+        }
+
+        @Override
+        public Entry[] newArray(int size) {
+            return new Entry[0];
+        }
+    };
 }

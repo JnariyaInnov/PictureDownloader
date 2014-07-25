@@ -9,12 +9,20 @@ import com.archee.picturedownloader.utils.DateUtils;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteSink;
+import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
+import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Date;
@@ -29,7 +37,6 @@ public class CacheStorage implements Storage {
     private static final String SEPARATOR = "$";
     private static final String CACHE_FILE = "entries";
 
-    private List<Entry> history = Lists.newArrayList();
     private File cacheFile;
 
     protected CacheStorage(Context applicationContext) {
@@ -38,6 +45,8 @@ public class CacheStorage implements Storage {
 
     @Override
     public List<Entry> getHistory() {
+        List<Entry> history = Lists.newArrayList();
+
         try {
             CharSource cacheSource = Files.asCharSource(cacheFile, Charset.defaultCharset());
             List<String> lines = cacheSource.readLines();
@@ -58,10 +67,10 @@ public class CacheStorage implements Storage {
 
     @Override
     public void addEntry(String entry, Date now) {
-        CharSink cacheSink = Files.asCharSink(cacheFile, Charset.defaultCharset());
+        CharSink cacheSink = Files.asCharSink(cacheFile, Charset.defaultCharset(), FileWriteMode.APPEND);
 
         try {
-            cacheSink.write(entry + SEPARATOR + DateUtils.DEFAULT_FORMATTER.format(now));
+            cacheSink.write(entry + SEPARATOR + DateUtils.DEFAULT_FORMATTER.format(now) + "\n");
         } catch (IOException e) {
             Log.e(PictureDownloader.TAG, "There was an error writing to the cache: " + e.getMessage());
         }
@@ -89,5 +98,4 @@ public class CacheStorage implements Storage {
 
         return null;
     }
-
 }
