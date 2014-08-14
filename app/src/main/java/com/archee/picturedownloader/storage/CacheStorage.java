@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by Archee on 7/13/2014.
+ * Implementation of cache storage.
  */
 public class CacheStorage implements Storage {
 
