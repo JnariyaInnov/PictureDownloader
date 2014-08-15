@@ -123,10 +123,6 @@ public class PictureDownloader extends Activity {
             Intent intent = new Intent(this, ListViewActivity.class);
             intent.putParcelableArrayListExtra(PictureDownloader.EXTRA_HISTORY, historyArrayList);
             startActivityForResult(intent, 1);
-
-            for (Entry entry : history) {
-                Log.d(TAG, entry.getUrl() + " - " + DateUtils.format(entry.getDate()));
-            }
         } else {
             Toast.makeText(this, "There is no history", Toast.LENGTH_SHORT).show();
         }
