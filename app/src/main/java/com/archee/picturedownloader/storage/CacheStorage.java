@@ -1,7 +1,6 @@
 package com.archee.picturedownloader.storage;
 
 import android.content.Context;
-import android.graphics.Picture;
 import android.util.Log;
 
 import com.archee.picturedownloader.PictureDownloader;
@@ -9,22 +8,14 @@ import com.archee.picturedownloader.utils.DateUtils;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.io.ByteSink;
-import com.google.common.io.ByteSource;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;

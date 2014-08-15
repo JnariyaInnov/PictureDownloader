@@ -2,10 +2,8 @@ package com.archee.picturedownloader.storage;
 
 import android.content.Context;
 
-import java.util.List;
-
 /**
- * Created by Archee on 7/13/2014.
+ * A class to create an instance of the chosen storage method.
  */
 public class StorageFactory {
 
@@ -18,7 +16,7 @@ public class StorageFactory {
                 return new DatabaseStorage(applicationContext);
 
             default:
-                throw new AssertionError("Storage type not supported.");
+                throw new IllegalArgumentException("Storage type not supported.");
         }
     }
 

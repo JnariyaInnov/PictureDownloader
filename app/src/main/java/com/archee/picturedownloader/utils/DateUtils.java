@@ -37,8 +37,8 @@ public class DateUtils {
 
     /**
      * Converts a java.util.Date object to a string using the defined default format yyyy-MM-dd HH:mm
-     * @param date
-     * @return
+     * @param date the date object to be formatted.
+     * @return the formatted date string.
      */
     public static String format(Date date) {
         return DEFAULT_FORMATTER.format(date);

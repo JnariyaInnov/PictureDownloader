@@ -5,13 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-import com.archee.picturedownloader.PictureDownloader;
 import com.archee.picturedownloader.utils.DateUtils;
 import com.google.common.collect.Lists;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -20,11 +17,9 @@ import java.util.List;
  */
 public class DatabaseStorage implements Storage {
 
-    private Context applicationContext;
     private SQLiteDatabase mDBWrite, mDBRead;
 
     protected DatabaseStorage(Context applicationContext) {
-        this.applicationContext = applicationContext;
         this.mDBWrite = new PictureDBHelper(applicationContext).getWritableDatabase();
         this.mDBRead = new PictureDBHelper(applicationContext).getReadableDatabase();
     }

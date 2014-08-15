@@ -2,12 +2,9 @@ package com.archee.picturedownloader.storage;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
-import com.archee.picturedownloader.PictureDownloader;
 import com.archee.picturedownloader.utils.DateUtils;
 
-import java.text.ParseException;
 import java.util.Date;
 
 /**
