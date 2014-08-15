@@ -41,14 +41,7 @@ public class DatabaseStorage implements Storage {
         // Iterate all rows returned from DB and store as Entries in a list.
         while (c.getPosition() != c.getCount()) {
             String url = c.getString(0);
-            Date date;
-
-            try {
-                date = DateUtils.DEFAULT_FORMATTER.parse(c.getString(1));
-            } catch (ParseException e) {
-                Log.e(PictureDownloader.TAG, "Error parsing date string from DB, using today's date.");
-                date = new Date();
-            }
+            Date date = DateUtils.parse(c.getString(1));
 
             entries.add(new Entry(url, date));
             c.moveToNext();
@@ -62,7 +55,7 @@ public class DatabaseStorage implements Storage {
     public void addEntry(String entry, Date now) {
         ContentValues values = new ContentValues();
         values.put(PictureDBHelper.PICTURE_URL, entry);
-        values.put(PictureDBHelper.ENTRY_DATE, DateUtils.DEFAULT_FORMATTER.format(now));
+        values.put(PictureDBHelper.ENTRY_DATE, DateUtils.format(now));
 
         mDBWrite.insert(PictureDBHelper.ENTRIES_TABLE, null, values);
     }

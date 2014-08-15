@@ -45,7 +45,7 @@ public class Entry implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
                 this.url,
-                DateUtils.DEFAULT_FORMATTER.format(this.date)
+                DateUtils.format(this.date)
         });
     }
 
@@ -54,16 +54,11 @@ public class Entry implements Parcelable {
         public Entry createFromParcel(Parcel source) {
             String[] data = new String[2];
             source.readStringArray(data);
+
             String url = data[0];
-            Date d = null;
+            Date date = DateUtils.parse(data[1]);
 
-            try {
-                d = DateUtils.DEFAULT_FORMATTER.parse(data[1]);
-            } catch (ParseException e) {
-                Log.e(PictureDownloader.TAG, "There was a parsing error. " + e.getMessage());
-            }
-
-            return new Entry(url, d);
+            return new Entry(url, date);
         }
 
         @Override

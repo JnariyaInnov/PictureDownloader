@@ -70,7 +70,7 @@ public class CacheStorage implements Storage {
         CharSink cacheSink = Files.asCharSink(cacheFile, Charset.defaultCharset(), FileWriteMode.APPEND);
 
         try {
-            cacheSink.write(entry + SEPARATOR + DateUtils.DEFAULT_FORMATTER.format(now) + "\n");
+            cacheSink.write(entry + SEPARATOR + DateUtils.format(now) + "\n");
         } catch (IOException e) {
             Log.e(PictureDownloader.TAG, "There was an error writing to the cache: " + e.getMessage());
         }
@@ -89,11 +89,7 @@ public class CacheStorage implements Storage {
             String url = it.next();
             String date = it.next();
 
-            try {
-                return new Entry(url, DateUtils.DEFAULT_FORMATTER.parse(date));
-            } catch (ParseException e) {
-                Log.e(PictureDownloader.TAG, "There was an error parsing the date string: " + date);
-            }
+            return new Entry(url, DateUtils.parse(date));
         }
 
         return null;
