@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import com.archee.picturedownloader.async.DownloadImage;
 import com.archee.picturedownloader.storage.domain.Entry;
 import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
@@ -81,9 +82,10 @@ public class PictureDownloader extends Activity {
         String imageUrlStr = urlEditText.getText().toString();
 
         try {
-            // Attempt to download image in a background thread.
             URL imageUrl = new URL(imageUrlStr);
-            AsyncTask downloadTask = new DownloadImage().execute(imageUrl);
+
+            // Attempt to download image in a background thread.
+            AsyncTask downloadTask = new DownloadImage(downloadButton, progressBar).execute(imageUrl);
 
             try {
                 // Retrieve downloaded image from background thread, if there is a result.
@@ -151,52 +153,5 @@ public class PictureDownloader extends Activity {
         // Recreate the new bitmap
         return Bitmap.createBitmap(bm, 0, 0, width, height,
                 matrix, false);
-    }
-
-    private class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
-
-        private Bitmap getBitmapFromURL(URL url) {
-            try {
-                HttpURLConnection connection = (HttpURLConnection) url
-                        .openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-
-                return BitmapFactory.decodeStream(input);
-            } catch (IOException e) {
-                Log.e(TAG, "Bitmap download failed. " + e.getMessage());
-                return null;
-            }
-        }
-
-        @Override
-        protected Bitmap doInBackground(URL... params) {
-            return getBitmapFromURL(params[0]);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            downloadButton.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap aBitmap) {
-            super.onPostExecute(aBitmap);
-            progressBar.setVisibility(View.GONE);
-            downloadButton.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
     }
 }
