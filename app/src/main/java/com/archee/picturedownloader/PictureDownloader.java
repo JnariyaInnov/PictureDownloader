@@ -26,11 +26,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.archee.picturedownloader.storage.Entry;
+import com.archee.picturedownloader.storage.domain.Entry;
 import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
-import com.archee.picturedownloader.storage.StorageType;
-import com.archee.picturedownloader.utils.DateUtils;
+import com.archee.picturedownloader.enums.StorageType;
 import com.archee.picturedownloader.views.ListViewActivity;
 
 

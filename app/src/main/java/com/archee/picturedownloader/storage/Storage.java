@@ -1,5 +1,7 @@
 package com.archee.picturedownloader.storage;
 
+import com.archee.picturedownloader.storage.domain.Entry;
+
 import java.util.Date;
 import java.util.List;
 

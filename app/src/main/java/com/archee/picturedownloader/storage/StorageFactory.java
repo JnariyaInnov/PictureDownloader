@@ -2,6 +2,10 @@ package com.archee.picturedownloader.storage;
 
 import android.content.Context;
 
+import com.archee.picturedownloader.enums.StorageType;
+import com.archee.picturedownloader.storage.impl.CacheStorage;
+import com.archee.picturedownloader.storage.impl.DatabaseStorage;
+
 /**
  * A class to create an instance of the chosen storage method.
  */

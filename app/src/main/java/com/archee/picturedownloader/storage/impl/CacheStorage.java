@@ -1,9 +1,11 @@
-package com.archee.picturedownloader.storage;
+package com.archee.picturedownloader.storage.impl;
 
 import android.content.Context;
 import android.util.Log;
 
 import com.archee.picturedownloader.PictureDownloader;
+import com.archee.picturedownloader.storage.domain.Entry;
+import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.utils.DateUtils;
 
 import com.google.common.base.Splitter;
@@ -30,7 +32,7 @@ public class CacheStorage implements Storage {
 
     private File cacheFile;
 
-    protected CacheStorage(Context applicationContext) {
+    public CacheStorage(Context applicationContext) {
         cacheFile = new File(applicationContext.getCacheDir(), CACHE_FILE);
     }
 

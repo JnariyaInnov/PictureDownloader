@@ -1,4 +1,4 @@
-package com.archee.picturedownloader.storage;
+package com.archee.picturedownloader.enums;
 
 /**
  * An enum that defines the various types of storage options

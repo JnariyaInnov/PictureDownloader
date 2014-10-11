@@ -13,7 +13,7 @@ import android.widget.ListView;
 
 import com.archee.picturedownloader.PictureDownloader;
 import com.archee.picturedownloader.R;
-import com.archee.picturedownloader.storage.Entry;
+import com.archee.picturedownloader.storage.domain.Entry;
 
 import java.util.List;
 

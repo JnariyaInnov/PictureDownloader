@@ -1,4 +1,4 @@
-package com.archee.picturedownloader.storage;
+package com.archee.picturedownloader.storage.domain;
 
 import android.os.Parcel;
 import android.os.Parcelable;

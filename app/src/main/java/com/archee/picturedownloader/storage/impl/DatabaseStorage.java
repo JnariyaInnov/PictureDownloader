@@ -1,4 +1,4 @@
-package com.archee.picturedownloader.storage;
+package com.archee.picturedownloader.storage.impl;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.archee.picturedownloader.storage.domain.Entry;
+import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.utils.DateUtils;
 import com.google.common.collect.Lists;
 
@@ -19,7 +21,7 @@ public class DatabaseStorage implements Storage {
 
     private SQLiteDatabase mDBWrite, mDBRead;
 
-    protected DatabaseStorage(Context applicationContext) {
+    public DatabaseStorage(Context applicationContext) {
         this.mDBWrite = new PictureDBHelper(applicationContext).getWritableDatabase();
         this.mDBRead = new PictureDBHelper(applicationContext).getReadableDatabase();
     }
