@@ -20,6 +20,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/imageUrl"
             android:layout_gravity="center_horizontal"
+            android:inputType="textUri"
+            android:hint="URL input box"
             android:text="Enter URL here... "
             android:onClick="setDefaultProtocol"/>
 

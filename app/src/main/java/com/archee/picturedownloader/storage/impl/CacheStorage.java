@@ -74,7 +74,7 @@ public class CacheStorage implements Storage {
      * @param line A string that is formatted in a way whereas it can be represented as an Entry
      * @return an Entry object, or null if there is a formatting error.
      */
-    protected Entry parseEntryFromLine(String line) {
+    private Entry parseEntryFromLine(String line) {
         Splitter splitter = Splitter.on(SEPARATOR);
         Iterator<String> it = splitter.split(line).iterator();
 
