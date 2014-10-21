@@ -11,7 +11,7 @@ import com.archee.picturedownloader.storage.impl.DatabaseStorage;
  */
 public class StorageFactory {
 
-    public static Storage getInstance(Context applicationContext, StorageType storageType) {
+    public static Storage create(Context applicationContext, StorageType storageType) {
         switch (storageType) {
             case CACHE:
                 return new CacheStorage(applicationContext);
