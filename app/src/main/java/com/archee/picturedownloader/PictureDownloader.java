@@ -58,7 +58,7 @@ public class PictureDownloader extends Activity {
         imageView = (ImageView) findViewById(R.id.imageView);
 
         // Storage object user for persisting data
-        storage = StorageFactory.getInstance(getApplicationContext(), StorageType.DATABASE);
+        storage = StorageFactory.create(getApplicationContext(), StorageType.DATABASE);
 
         // Auto-populate the URL protocol in text box when pressed
         displayProtocol = true;
