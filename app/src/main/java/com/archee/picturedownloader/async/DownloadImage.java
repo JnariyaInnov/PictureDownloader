@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
+public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
 
     public static final String TAG = "PictureDownloader";
 
@@ -36,7 +36,7 @@ public class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
         this.progressBar = progressBar;
     }
 
-    private Bitmap getBitmapFromURL(URL url) {
+    private ImageResponse getBitmapFromURL(URL url) {
         try {
             HttpURLConnection connection = (HttpURLConnection) url
                     .openConnection();
@@ -44,7 +44,7 @@ public class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
             connection.connect();
             InputStream input = connection.getInputStream();
 
-            return BitmapFactory.decodeStream(input);
+            return new ImageResponse(url, BitmapFactory.decodeStream(input), connection.getResponseCode());
         } catch (IOException e) {
             Log.e(TAG, "Bitmap download failed. " + e.getMessage());
             return null;
@@ -52,7 +52,7 @@ public class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
     }
 
     @Override
-    protected Bitmap doInBackground(URL... params) {
+    protected ImageResponse doInBackground(URL... params) {
         return getBitmapFromURL(params[0]);
     }
 
@@ -70,8 +70,8 @@ public class DownloadImage extends AsyncTask<URL, Integer, Bitmap> {
     }
 
     @Override
-    protected void onPostExecute(Bitmap aBitmap) {
-        super.onPostExecute(aBitmap);
+    protected void onPostExecute(ImageResponse response) {
+        super.onPostExecute(response);
 
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);

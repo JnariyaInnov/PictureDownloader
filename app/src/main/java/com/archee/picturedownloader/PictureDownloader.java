@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import com.archee.picturedownloader.async.DownloadImage;
+import com.archee.picturedownloader.async.ImageResponse;
 import com.archee.picturedownloader.storage.domain.Entry;
 import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
@@ -85,10 +86,10 @@ public class PictureDownloader extends Activity {
 
             try {
                 // Retrieve downloaded image from background thread, if there is a result.
-                Bitmap bm = (Bitmap) downloadTask.get();
+                ImageResponse response = (ImageResponse) downloadTask.get();
 
-                if (bm != null) {
-                    Bitmap resizedBitmap = getResizedBitmap(bm, imageView.getHeight(), imageView.getWidth());
+                if (response != null && response.getResponseCode() != 404) {
+                    Bitmap resizedBitmap = getResizedBitmap(response.getImage(), imageView.getHeight(), imageView.getWidth());
                     imageView.setImageBitmap(resizedBitmap);
 
                     storage.addEntry(imageUrlStr, new Date());
