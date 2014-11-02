@@ -19,7 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import com.archee.picturedownloader.async.DownloadImage;
@@ -110,7 +110,7 @@ public class PictureDownloader extends Activity {
     }
 
     public void onHistoryPress(View view) {
-        List<Entry> history = storage.getHistory();
+        Set<Entry> history = storage.getHistory();
 
         if (!history.isEmpty()) {
             // Convert history List to ArrayList so we can pass it in the intent.

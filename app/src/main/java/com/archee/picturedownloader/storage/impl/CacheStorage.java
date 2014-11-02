@@ -10,6 +10,7 @@ import com.archee.picturedownloader.utils.DateUtils;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.FileWriteMode;
@@ -21,6 +22,7 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of cache storage.
@@ -37,8 +39,8 @@ public class CacheStorage implements Storage {
     }
 
     @Override
-    public List<Entry> getHistory() {
-        List<Entry> history = Lists.newArrayList();
+    public Set<Entry> getHistory() {
+        Set<Entry> history = Sets.newHashSet();
 
         try {
             CharSource cacheSource = Files.asCharSource(cacheFile, Charset.defaultCharset());
