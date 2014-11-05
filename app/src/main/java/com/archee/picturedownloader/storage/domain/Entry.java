@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.archee.picturedownloader.utils.DateUtils;
+import com.google.common.base.Objects;
 
 import java.util.Date;
 
@@ -44,6 +45,19 @@ public class Entry implements Parcelable {
                 this.url,
                 DateUtils.format(this.date)
         });
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof Entry)) return false;
+
+        return  Objects.equal(this.getUrl(), ((Entry) obj).getUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.url);
     }
 
     public static final Parcelable.Creator<Entry> CREATOR = new Creator<Entry>() {
