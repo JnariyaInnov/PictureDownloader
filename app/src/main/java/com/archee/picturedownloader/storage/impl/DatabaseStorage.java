@@ -32,8 +32,8 @@ public class DatabaseStorage implements Storage {
         Set<Entry> entries = Sets.newHashSet();
 
         // Perform Select query to get all rows from DB.
-        Cursor c = mDBRead.query(PictureDBHelper.ENTRIES_TABLE, new String[] {PictureDBHelper.COL_PICTURE_URL, PictureDBHelper.COL_ENTRY_DATE},
-                null, null, null, null, null);
+        Cursor c = mDBRead.query(true, PictureDBHelper.ENTRIES_TABLE, new String[] {PictureDBHelper.COL_PICTURE_URL, PictureDBHelper.COL_ENTRY_DATE},
+                null, null, null, null, null, null);
         c.moveToNext();
 
         // Iterate all rows returned from DB and store as Entries in a list.
