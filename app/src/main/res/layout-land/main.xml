@@ -27,6 +27,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/progressBar"
             android:layout_gravity="center_horizontal"
+            android:minHeight="20dp"
+            android:minWidth="20dp"
             android:visibility="gone"
             android:clickable="false" />
 
@@ -35,14 +37,16 @@
             android:layout_height="wrap_content"
             android:text="@string/download"
             android:id="@+id/downloadButton"
-            android:onClick="onDownloadPress" />
+            android:onClick="onDownloadPress"
+            style="@style/BootstrapButton"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/history"
             android:id="@+id/historyButton"
-            android:onClick="onHistoryPress" />
+            android:onClick="onHistoryPress"
+            style="@style/BootstrapButton"/>
 
     </LinearLayout>
 
