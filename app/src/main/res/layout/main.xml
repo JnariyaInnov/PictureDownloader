@@ -25,20 +25,12 @@
             android:text="Enter URL here... "
             android:onClick="setDefaultProtocol"/>
 
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:layout_gravity="center_horizontal"
-            android:visibility="gone"
-            android:clickable="false" />
-
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:layout_width="192dp"
+                android:layout_width="@dimen/download_button_dimen"
                 android:layout_height="wrap_content"
                 android:text="@string/download"
                 android:id="@+id/downloadButton"
@@ -59,5 +51,15 @@
             android:layout_height="fill_parent"
             android:id="@+id/imageView"
             android:layout_marginTop="@dimen/activity_vertical_margin" />
+
     </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="@dimen/download_button_dimen"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:clickable="false"
+        android:layout_centerInParent="true" />
 </RelativeLayout>

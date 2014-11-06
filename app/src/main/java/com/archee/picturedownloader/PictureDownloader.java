@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import com.archee.picturedownloader.async.AsyncImageCallback;
 import com.archee.picturedownloader.async.DownloadImage;
 import com.archee.picturedownloader.async.ImageResponse;
 import com.archee.picturedownloader.storage.domain.Entry;
@@ -82,31 +83,11 @@ public class PictureDownloader extends Activity {
             URL imageUrl = new URL(imageUrlStr);
 
             // Attempt to download image in a background thread.
-            AsyncTask downloadTask = new DownloadImage(downloadButton, progressBar).execute(imageUrl);
-
-            try {
-                // Retrieve downloaded image from background thread, if there is a result.
-                ImageResponse response = (ImageResponse) downloadTask.get();
-
-                if (response != null && response.getResponseCode() != 404) {
-                    Bitmap resizedBitmap = getResizedBitmap(response.getImage(), imageView.getHeight(), imageView.getWidth());
-                    imageView.setImageBitmap(resizedBitmap);
-
-                    storage.addEntry(imageUrlStr, new Date());
-                } else {
-                    Log.e(TAG, "Bitmap object is null");
-                }
-
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Bitmap download failed. " + e.getMessage());
-            } catch (ExecutionException e) {
-                Log.e(TAG, "Bitmap download failed. " + e.getMessage());
-            }
+            new DownloadImage(progressBar, new ImageDownloadHandler()).execute(imageUrl);
 
         } catch (MalformedURLException e) {
             Toast.makeText(getApplicationContext(), "Invalid URL!", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     public void onHistoryPress(View view) {
@@ -150,5 +131,23 @@ public class PictureDownloader extends Activity {
         // Recreate the new bitmap
         return Bitmap.createBitmap(bm, 0, 0, width, height,
                 matrix, false);
+    }
+
+    /**
+     * A callback handler that gets called from the AsyncTask when the image download completes.
+     */
+    private class ImageDownloadHandler implements AsyncImageCallback {
+        @Override
+        public void onDownloadComplete(ImageResponse response) {
+            if (response != null && response.getResponseCode() != 404) {
+                Bitmap resizedBitmap = getResizedBitmap(response.getImage(), imageView.getHeight(), imageView.getWidth());
+                imageView.setImageBitmap(resizedBitmap);
+
+                Log.d(PictureDownloader.TAG, "image URL: " + response.getUrl().toString());
+                storage.addEntry(response.getUrl().toString(), new Date());
+            } else {
+                Log.e(TAG, "Bitmap object is null");
+            }
+        }
     }
 }

@@ -17,8 +17,8 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
 
     public static final String TAG = "PictureDownloader";
 
-    private Button downloadButton;
     private ProgressBar progressBar;
+    private AsyncImageCallback callback;
 
     /**
      * Use this constructor if no View animations are needed during download.
@@ -28,12 +28,11 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
     /**
      * An optional constructor used for animating a download button and progress bar
      * while downloading an image.
-     * @param downloadButton the button will be disabled and reenable during download
      * @param progressBar the progress bar will be displayed while download is occurring.
      */
-    public DownloadImage(Button downloadButton, ProgressBar progressBar) {
-        this.downloadButton = downloadButton;
+    public DownloadImage(ProgressBar progressBar, AsyncImageCallback callback) {
         this.progressBar = progressBar;
+        this.callback = callback;
     }
 
     private ImageResponse getBitmapFromURL(URL url) {
@@ -59,11 +58,6 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-
-        if (downloadButton != null) {
-            downloadButton.setVisibility(View.GONE);
-        }
-
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
@@ -72,14 +66,11 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
     @Override
     protected void onPostExecute(ImageResponse response) {
         super.onPostExecute(response);
-
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
 
-        if (downloadButton != null) {
-            downloadButton.setVisibility(View.VISIBLE);
-        }
+        callback.onDownloadComplete(response);
     }
 
     @Override
