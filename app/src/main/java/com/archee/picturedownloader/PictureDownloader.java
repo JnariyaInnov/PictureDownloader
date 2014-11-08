@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -20,7 +19,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import com.archee.picturedownloader.async.AsyncImageCallback;
 import com.archee.picturedownloader.async.DownloadImage;

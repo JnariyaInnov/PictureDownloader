@@ -1,11 +1,9 @@
 package com.archee.picturedownloader.async;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 
 import java.io.IOException;
@@ -57,7 +55,6 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
 
     @Override
     protected void onPreExecute() {
-        super.onPreExecute();
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
@@ -65,7 +62,6 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
 
     @Override
     protected void onPostExecute(ImageResponse response) {
-        super.onPostExecute(response);
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }

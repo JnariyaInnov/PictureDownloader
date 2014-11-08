@@ -6,4 +6,5 @@
     <color name="button_background_pressed_end">#fb812c</color>
     <color name="button_background_disabled_start">#7b7b7b</color>
     <color name="button_background_disabled_end">#646464</color>
+    <color name="text_shadow">#000000</color>
 </resources>
