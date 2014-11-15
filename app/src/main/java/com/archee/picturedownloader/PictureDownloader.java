@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -27,6 +29,7 @@ import com.archee.picturedownloader.storage.domain.Entry;
 import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
 import com.archee.picturedownloader.enums.StorageType;
+import com.archee.picturedownloader.views.ClearableEditText;
 import com.archee.picturedownloader.views.ListViewActivity;
 
 
@@ -38,7 +41,7 @@ public class PictureDownloader extends Activity {
 
     private static final String DEFAULT_PROTOCOL = "http://";
 
-    private EditText urlEditText;
+    private ClearableEditText urlEditText;
     private ProgressBar progressBar;
     private Button downloadButton;
     private ImageView imageView;
@@ -52,7 +55,7 @@ public class PictureDownloader extends Activity {
         setContentView(R.layout.main);
 
         // Get references to UI components
-        urlEditText = (EditText) findViewById(R.id.imageUrl);
+        urlEditText = (ClearableEditText) findViewById(R.id.imageUrl);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         downloadButton = (Button) findViewById(R.id.downloadButton);
         imageView = (ImageView) findViewById(R.id.imageView);
@@ -69,9 +72,12 @@ public class PictureDownloader extends Activity {
         if (displayProtocol) {
             urlEditText.setText(DEFAULT_PROTOCOL);
             displayProtocol = false;
-            urlEditText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
             urlEditText.setSelection(urlEditText.getText().length());
         }
+    }
+
+    public void onClearPress(View view) {
+        urlEditText.clearText();
     }
 
     public void onDownloadPress(View view) {
@@ -141,7 +147,6 @@ public class PictureDownloader extends Activity {
                 Bitmap resizedBitmap = getResizedBitmap(response.getImage(), imageView.getHeight(), imageView.getWidth());
                 imageView.setImageBitmap(resizedBitmap);
 
-                Log.d(PictureDownloader.TAG, "image URL: " + response.getUrl().toString());
                 storage.addEntry(response.getUrl().toString(), new Date());
             } else {
                 Log.e(TAG, "Bitmap object is null");

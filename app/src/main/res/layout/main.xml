@@ -15,15 +15,32 @@
         android:layout_centerHorizontal="true"
         android:weightSum="1">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageUrl"
-            android:layout_gravity="center_horizontal"
-            android:inputType="textUri"
-            android:hint="URL input box"
-            android:text="Enter URL here... "
-            android:onClick="setDefaultProtocol"/>
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="40dp">
+
+            <com.archee.picturedownloader.views.ClearableEditText
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageUrl"
+                android:inputType="textUri"
+                android:hint="@string/enter_url"
+                android:onClick="setDefaultProtocol"/>
+
+            <Button
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:id="@+id/clearIcon"
+                android:background="@drawable/clear_text_icon_states"
+                android:drawablePadding="5dp"
+                android:onClick="onClearPress"
+                android:clickable="true"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="10dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:orientation="horizontal"

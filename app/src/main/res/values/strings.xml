@@ -7,5 +7,6 @@
     <string name="download">Download!</string>
     <string name="history">History</string>
     <string name="title_activity_list_view">History</string>
+    <string name="enter_url">Enter URL here&#8230;</string>
 
 </resources>
