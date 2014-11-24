@@ -9,7 +9,6 @@ import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.utils.DateUtils;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
@@ -69,6 +68,12 @@ public class CacheStorage implements Storage {
         } catch (IOException e) {
             Log.e(PictureDownloader.TAG, "There was an error writing to the cache: " + e.getMessage());
         }
+    }
+
+    @Override
+    public int deleteEntry(String url) {
+        //TODO: implement deletion from cache.
+        return 0;
     }
 
     /**

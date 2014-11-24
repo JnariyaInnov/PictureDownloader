@@ -20,4 +20,12 @@ public interface Storage {
     * Adds an entry to entry history.
     */
     void addEntry(String url, Date now);
+
+    /**
+     * Deletes an entry or entries from entry history.
+     *
+     * @param url entry to delete
+     * @return number of rows deleted
+     */
+    int deleteEntry(String url);
 }

@@ -4,14 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -47,7 +43,7 @@ public class PictureDownloader extends Activity {
     private ImageView imageView;
 
     private boolean displayProtocol;
-    private Storage storage;
+    private static Storage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

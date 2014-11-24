@@ -58,6 +58,11 @@ public class DatabaseStorage implements Storage {
         mDBWrite.insert(PictureDBHelper.ENTRIES_TABLE, null, values);
     }
 
+    @Override
+    public int deleteEntry(String url) {
+        return mDBWrite.delete(PictureDBHelper.ENTRIES_TABLE, PictureDBHelper.COL_PICTURE_URL + "=?", new String[]{url});
+    }
+
     private class PictureDBHelper extends SQLiteOpenHelper {
         private static final String DB_NAME = "picture_db";
         private static final String ENTRIES_TABLE = "entries";
