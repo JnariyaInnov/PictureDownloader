@@ -3,8 +3,11 @@ package com.archee.picturedownloader.async;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import com.google.common.base.Optional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +17,15 @@ import java.net.URL;
 public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
 
     public static final String TAG = "PictureDownloader";
+
+    private static final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+    private static final int cacheSize = maxMemory / 8;
+    private static LruCache<String, ImageResponse> imageCache = new LruCache<String, ImageResponse>(cacheSize) {
+        @Override
+        protected int sizeOf(String key, ImageResponse value) {
+            return value.getImage().getByteCount() / 1024;
+        }
+    };
 
     private ProgressBar progressBar;
     private AsyncImageCallback callback;
@@ -34,6 +46,12 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
     }
 
     private ImageResponse getBitmapFromURL(URL url) {
+        Optional<ImageResponse> cachedImageResponse = Optional.fromNullable(imageCache.get(url.toString()));
+
+        if (cachedImageResponse.isPresent()) {
+            return cachedImageResponse.get();
+        }
+
         try {
             HttpURLConnection connection = (HttpURLConnection) url
                     .openConnection();
@@ -41,7 +59,10 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
             connection.connect();
             InputStream input = connection.getInputStream();
 
-            return new ImageResponse(url, BitmapFactory.decodeStream(input), connection.getResponseCode());
+            ImageResponse imageResponse = new ImageResponse(url, BitmapFactory.decodeStream(input), connection.getResponseCode());
+            imageCache.put(url.toString(), imageResponse);
+
+            return imageResponse;
         } catch (IOException e) {
             Log.e(TAG, "Bitmap download failed. " + e.getMessage());
             return null;
