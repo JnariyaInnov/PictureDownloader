@@ -9,11 +9,14 @@ public class ImageResponse {
     private URL url;
     private Bitmap image;
     private int responseCode;
+    private int bitmapSize;
 
     public ImageResponse(URL url, Bitmap image, int responseCode) {
         this.url = url;
         this.image = image;
         this.responseCode = responseCode;
+
+        bitmapSize = image.getRowBytes() * image.getHeight() / 1024;
     }
 
     public int getResponseCode() {
@@ -38,5 +41,9 @@ public class ImageResponse {
 
     public void setImage(Bitmap image) {
         this.image = image;
+    }
+
+    public int getBitmapSize() {
+        return bitmapSize;
     }
 }
