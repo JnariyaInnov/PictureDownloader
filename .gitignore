@@ -3,6 +3,8 @@
 /.idea
 .DS_Store
 /build
+app/build
+wear/build
 
 *.iml
 **/.idea/workspace.xml
