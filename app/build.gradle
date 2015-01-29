@@ -22,6 +22,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.guava:guava:17.0'
+    compile 'com.google.android.support:wearable:+'
+    compile 'com.google.android.gms:play-services-wearable:+'
     compile files('lib/src/guava-17.0-sources.jar')
 }
 
