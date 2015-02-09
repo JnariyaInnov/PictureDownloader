@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
+public class DownloadImageTask extends AsyncTask<URL, Integer, ImageResponse> {
 
     public static final String TAG = "PictureDownloader";
 
@@ -28,19 +28,19 @@ public class DownloadImage extends AsyncTask<URL, Integer, ImageResponse> {
     };
 
     private ProgressBar progressBar;
-    private AsyncImageCallback callback;
+    private DownloadCompleteHandler callback;
 
     /**
      * Use this constructor if no View animations are needed during download.
      */
-    public DownloadImage() {}
+    public DownloadImageTask() {}
 
     /**
      * An optional constructor used for animating a download button and progress bar
      * while downloading an image.
      * @param progressBar the progress bar will be displayed while download is occurring.
      */
-    public DownloadImage(ProgressBar progressBar, AsyncImageCallback callback) {
+    public DownloadImageTask(ProgressBar progressBar, DownloadCompleteHandler callback) {
         this.progressBar = progressBar;
         this.callback = callback;
     }

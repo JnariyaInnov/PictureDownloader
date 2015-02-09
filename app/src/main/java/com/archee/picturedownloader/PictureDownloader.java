@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,32 +15,28 @@ import android.widget.Toast;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
-import com.archee.picturedownloader.async.AsyncImageCallback;
-import com.archee.picturedownloader.async.DownloadImage;
+import com.archee.picturedownloader.async.DownloadCompleteHandler;
+import com.archee.picturedownloader.async.DownloadImageTask;
 import com.archee.picturedownloader.async.ImageResponse;
+import com.archee.picturedownloader.async.SendEntryTask;
 import com.archee.picturedownloader.storage.domain.Entry;
 import com.archee.picturedownloader.storage.Storage;
 import com.archee.picturedownloader.storage.StorageFactory;
 import com.archee.picturedownloader.enums.StorageType;
 import com.archee.picturedownloader.views.ClearableEditText;
 import com.archee.picturedownloader.views.ListViewActivity;
+import com.archee.picturedownloader.wear.MessageHandler;
+import com.archee.picturedownloader.wear.SimpleEntryMessageListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 
-public class PictureDownloader extends Activity implements MessageApi.MessageListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class PictureDownloader extends Activity {
 
     public static final String TAG = "PictureDownloader";
     public static final String EXTRA_HISTORY = "com.archee.picturedownloader.HISTORY";
@@ -60,6 +55,9 @@ public class PictureDownloader extends Activity implements MessageApi.MessageLis
     private static Storage storage;
     private GoogleApiClient mGoogleApiClient;
     private boolean mConnected = false;
+
+    private MessageApi.MessageListener mEntryMessageListener = new SimpleEntryMessageListener(SEND_ENTRY, new SimpleEntryMessageHandler());
+    private WearableConnectionHandler mConnectionHandler = new WearableConnectionHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +78,8 @@ public class PictureDownloader extends Activity implements MessageApi.MessageLis
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(mConnectionHandler)
+                .addOnConnectionFailedListener(mConnectionHandler)
                 .build();
 
     }
@@ -125,7 +123,7 @@ public class PictureDownloader extends Activity implements MessageApi.MessageLis
             URL imageUrl = new URL(imageUrlStr);
 
             // Attempt to download image in a background thread.
-            new DownloadImage(progressBar, new ImageDownloadHandler()).execute(imageUrl);
+            new DownloadImageTask(progressBar, new ImageDownloadHandler()).execute(imageUrl);
 
         } catch (MalformedURLException e) {
             Toast.makeText(getApplicationContext(), "Invalid URL!", Toast.LENGTH_SHORT).show();
@@ -160,45 +158,11 @@ public class PictureDownloader extends Activity implements MessageApi.MessageLis
         }
     }
 
-    @Override // ConnectionCallbacks
-    public void onConnected(Bundle connectionHint) {
-        Log.d(TAG, "Google API Client was connected");
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
-    }
 
-    @Override // ConnectionCallbacks
-    public void onConnectionSuspended(int cause) {
-        Log.d(TAG, "Connection to Google API client was suspended: " + cause);
-    }
-
-    @Override // OnConnectionFailedListener
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "Connection to Google API client has failed");
-        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
-    }
-
-    @Override // MessageListener
-    public void onMessageReceived(MessageEvent messageEvent) {
-        Log.d(TAG, "onMessageReceived: " + messageEvent);
-
-        if (messageEvent.getPath().equals(SEND_ENTRY)) {
-            byte[] payload = messageEvent.getData();
-            final String entryStr = new String(payload);
-            Log.i(TAG, "Received entry from wearable: " + entryStr);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    urlEditText.setText(entryStr);
-                    onDownloadPress(null); // press download button
-                }
-            });
-        }
-    }
 
     private void sendHistoryToWearable() {
         Log.i(TAG, "Sending History to wearable...");
-        new SendEntryTask().execute();
+        new SendEntryTask(mGoogleApiClient, GET_ENTRIES, createHistoryPayload()).execute();
     }
 
     private byte[] createHistoryPayload() {
@@ -228,10 +192,23 @@ public class PictureDownloader extends Activity implements MessageApi.MessageLis
                 matrix, false);
     }
 
+    private class SimpleEntryMessageHandler implements MessageHandler {
+        @Override
+        public void handleMessage(final String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    urlEditText.setText(msg);
+                    onDownloadPress(null); // press download button
+                }
+            });
+        }
+    }
+
     /**
      * A callback handler that gets called from the AsyncTask when the image download completes.
      */
-    private class ImageDownloadHandler implements AsyncImageCallback {
+    private class ImageDownloadHandler implements DownloadCompleteHandler {
         @Override
         public void onDownloadComplete(ImageResponse response) {
             if (response != null && response.getResponseCode() != 404) {
@@ -246,29 +223,23 @@ public class PictureDownloader extends Activity implements MessageApi.MessageLis
         }
     }
 
-    private class SendEntryTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            Collection<String> nodes = getNodes();
-            Log.d(TAG, "sendHistoryToWearable is sending a message to " + nodes.size() + " nodes.");
-            for (String node : nodes) {
-                Wearable.MessageApi.sendMessage(mGoogleApiClient, node, GET_ENTRIES, createHistoryPayload());
-            }
+    private class WearableConnectionHandler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-            return null;
+        @Override // ConnectionCallbacks
+        public void onConnected(Bundle connectionHint) {
+            Log.d(TAG, "Google API Client was connected");
+            Wearable.MessageApi.addListener(mGoogleApiClient, mEntryMessageListener);
         }
 
-        private Collection<String> getNodes() {
-            HashSet<String> results = new HashSet<String>();
-            NodeApi.GetConnectedNodesResult nodes =
-                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+        @Override // ConnectionCallbacks
+        public void onConnectionSuspended(int cause) {
+            Log.d(TAG, "Connection to Google API client was suspended: " + cause);
+        }
 
-            for (Node node : nodes.getNodes()) {
-                Log.d(TAG, "Node display name: " + node.getDisplayName());
-                results.add(node.getId());
-            }
-
-            return results;
+        @Override // OnConnectionFailedListener
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+            Log.e(TAG, "Connection to Google API client has failed");
+            Wearable.MessageApi.removeListener(mGoogleApiClient, mEntryMessageListener);
         }
     }
 }
