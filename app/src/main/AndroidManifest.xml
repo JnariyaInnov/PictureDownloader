@@ -23,6 +23,11 @@
             android:label="@string/title_activity_list_view"
             android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
+
+        <service android:name=".PictureRatingService"
+            android:enabled="true"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

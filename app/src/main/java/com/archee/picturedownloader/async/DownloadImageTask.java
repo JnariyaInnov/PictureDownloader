@@ -20,12 +20,7 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, ImageResponse> {
 
     private static final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
     private static final int cacheSize = maxMemory / 8;
-    private static LruCache<String, ImageResponse> imageCache = new LruCache<String, ImageResponse>(cacheSize) {
-        @Override
-        protected int sizeOf(String key, ImageResponse value) {
-            return value.getImage().getByteCount() / 1024;
-        }
-    };
+    private static LruCache<String, ImageResponse> imageCache = new LruCache<String, ImageResponse>(cacheSize);
 
     private ProgressBar progressBar;
     private DownloadCompleteHandler callback;

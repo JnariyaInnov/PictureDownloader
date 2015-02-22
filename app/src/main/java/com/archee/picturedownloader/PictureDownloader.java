@@ -1,10 +1,16 @@
 package com.archee.picturedownloader;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.RemoteInput;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,7 +21,9 @@ import android.widget.Toast;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import com.archee.picturedownloader.async.DownloadCompleteHandler;
@@ -41,8 +49,10 @@ public class PictureDownloader extends Activity {
     public static final String TAG = "PictureDownloader";
     public static final String EXTRA_HISTORY = "com.archee.picturedownloader.HISTORY";
     public static final String EXTRA_URL = "com.archee.picturedownloader.URL";
+    public static final String EXTRA_IMAGE = "com.archee.picturedownloader.image";
     public static final String SEND_ENTRY = "/com/archee/picturedownloader/entry";
     public static final String GET_ENTRIES = "/com/archee/picturedownloader/entries";
+    public static final int DOWNLOAD_COMPLETE_NOTIF = 1;
 
     private static final String DEFAULT_PROTOCOL = "http://";
 
@@ -50,12 +60,17 @@ public class PictureDownloader extends Activity {
     private ProgressBar progressBar;
     private Button downloadButton;
     private ImageView imageView;
-
     private boolean displayProtocol;
     private static Storage storage;
+
+    /* Rating service stuff */
+    /*private PictureRatingService mRatingService;
+    private PictureRatingServiceConnection mRatingServiceConnection;
+    private boolean mRatingServiceBound;*/
+
+    /* Google Wearable API stuff */
     private GoogleApiClient mGoogleApiClient;
     private boolean mConnected = false;
-
     private MessageApi.MessageListener mEntryMessageListener = new SimpleEntryMessageListener(SEND_ENTRY, new SimpleEntryMessageHandler());
     private WearableConnectionHandler mConnectionHandler = new WearableConnectionHandler();
 
@@ -82,6 +97,12 @@ public class PictureDownloader extends Activity {
                 .addOnConnectionFailedListener(mConnectionHandler)
                 .build();
 
+        /*Intent intent = new Intent(this, PictureRatingService.class);
+        if (mRatingServiceConnection == null)
+            mRatingServiceConnection = new PictureRatingServiceConnection();
+
+        // Bind to the service in onCreate() and unbind in onDestroy() so that service remains connected even while activity is stopped.
+        bindService(intent, mRatingServiceConnection, Context.BIND_AUTO_CREATE);*/
     }
 
     @Override
@@ -103,6 +124,16 @@ public class PictureDownloader extends Activity {
             mGoogleApiClient.disconnect();
         }
     }
+
+    /*@Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mRatingServiceBound) {
+            unbindService(mRatingServiceConnection);
+            mRatingServiceBound = false;
+        }
+    }*/
 
     public void setDefaultProtocol(View view) {
         if (displayProtocol) {
@@ -209,6 +240,14 @@ public class PictureDownloader extends Activity {
      * A callback handler that gets called from the AsyncTask when the image download completes.
      */
     private class ImageDownloadHandler implements DownloadCompleteHandler {
+
+        private static final String RATING = "rating";
+        private static final String RATING_ITEM = "item";
+        private static final String RATING_LIKE = "like";
+        private static final String RATING_DISLIKE = "dislike";
+        private static final String RATING_FAVORITE = "favorite";
+        private static final String RATING_COMMENT = "comment";
+
         @Override
         public void onDownloadComplete(ImageResponse response) {
             if (response != null && response.getResponseCode() != 404) {
@@ -217,11 +256,72 @@ public class PictureDownloader extends Activity {
 
                 storage.addEntry(response.getUrl().toString(), new Date());
                 sendHistoryToWearable();
+
+                NotificationCompat.Builder mainNotifBuilder = new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(android.R.drawable.ic_menu_gallery)
+                        .setContentTitle("Picture download complete.")
+                        .setTicker("Your picture download is complete.")
+                        .setVibrate(new long[]{0, 300, 100, 300});
+
+                Bitmap wearImage = getResizedBitmap(response.getImage(), 640, 400);
+                Notification secondPage = new NotificationCompat.Builder(getApplicationContext())
+                        .extend(new NotificationCompat.WearableExtender().setHintShowBackgroundOnly(true))
+                        .build();
+
+
+
+                NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender()
+                        .addPage(secondPage)
+                        .setBackground(wearImage)
+                        .addActions(buildNotificationActionList(response.getUrl().toString()));
+
+                Notification mainNotif = mainNotifBuilder.extend(wearableExtender).build();
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                notificationManager.notify(DOWNLOAD_COMPLETE_NOTIF, mainNotif);
             } else {
                 Log.e(TAG, "Bitmap object is null");
             }
         }
+
+        @TargetApi(20)
+        private List<NotificationCompat.Action> buildNotificationActionList(String urlToRate) {
+
+            RemoteInput remoteInput = new RemoteInput.Builder(RATING_COMMENT)
+                    .setLabel("Any thoughts on this picture?")
+                    .build();
+
+            Intent goodActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_LIKE).putExtra(RATING_ITEM, urlToRate);
+            Intent badActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_DISLIKE).putExtra(RATING_ITEM, urlToRate);
+            Intent favoriteActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_FAVORITE).putExtra(RATING_ITEM, urlToRate);
+            Intent commentActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_COMMENT).putExtra(RATING_ITEM, urlToRate);
+            PendingIntent goodActionPendingIntent = PendingIntent.getService(getApplicationContext(), 0, goodActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent badActionPendingIntent = PendingIntent.getService(getApplicationContext(), 1, badActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent favoriteActionPendingIntent = PendingIntent.getService(getApplicationContext(), 2, favoriteActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent commentActionPendingIntent = PendingIntent.getService(getApplicationContext(), 3, commentActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Action.Builder goodAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_good, "Good", goodActionPendingIntent);
+            NotificationCompat.Action.Builder badAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_bad, "Bad", badActionPendingIntent);
+            NotificationCompat.Action.Builder favoriteAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_favorite, "Favorite", favoriteActionPendingIntent);
+            NotificationCompat.Action.Builder commentAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_chat, "Comment", commentActionPendingIntent)
+                    .addRemoteInput(remoteInput);
+
+            return Arrays.asList(goodAction.build(), badAction.build(), favoriteAction.build(), commentAction.build());
+        }
     }
+
+    /*private class PictureRatingServiceConnection implements ServiceConnection {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mRatingServiceBound = false;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mRatingService = ((PictureRatingService.RatingServiceBinder) service).getService();
+            mRatingServiceBound = true;
+        }
+    }*/
 
     private class WearableConnectionHandler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
