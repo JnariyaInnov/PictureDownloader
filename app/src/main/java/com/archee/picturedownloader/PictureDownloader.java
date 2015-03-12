@@ -63,11 +63,6 @@ public class PictureDownloader extends Activity {
     private boolean displayProtocol;
     private static Storage storage;
 
-    /* Rating service stuff */
-    /*private PictureRatingService mRatingService;
-    private PictureRatingServiceConnection mRatingServiceConnection;
-    private boolean mRatingServiceBound;*/
-
     /* Google Wearable API stuff */
     private GoogleApiClient mGoogleApiClient;
     private boolean mConnected = false;
@@ -97,12 +92,6 @@ public class PictureDownloader extends Activity {
                 .addOnConnectionFailedListener(mConnectionHandler)
                 .build();
 
-        /*Intent intent = new Intent(this, PictureRatingService.class);
-        if (mRatingServiceConnection == null)
-            mRatingServiceConnection = new PictureRatingServiceConnection();
-
-        // Bind to the service in onCreate() and unbind in onDestroy() so that service remains connected even while activity is stopped.
-        bindService(intent, mRatingServiceConnection, Context.BIND_AUTO_CREATE);*/
     }
 
     @Override
@@ -124,16 +113,6 @@ public class PictureDownloader extends Activity {
             mGoogleApiClient.disconnect();
         }
     }
-
-    /*@Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (mRatingServiceBound) {
-            unbindService(mRatingServiceConnection);
-            mRatingServiceBound = false;
-        }
-    }*/
 
     public void setDefaultProtocol(View view) {
         if (displayProtocol) {
@@ -189,8 +168,6 @@ public class PictureDownloader extends Activity {
         }
     }
 
-
-
     private void sendHistoryToWearable() {
         Log.i(TAG, "Sending History to wearable...");
         new SendEntryTask(mGoogleApiClient, GET_ENTRIES, createHistoryPayload()).execute();
@@ -225,11 +202,11 @@ public class PictureDownloader extends Activity {
 
     private class SimpleEntryMessageHandler implements MessageHandler {
         @Override
-        public void handleMessage(final String msg) {
+        public void handleStringMessage(final String message) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    urlEditText.setText(msg);
+                    urlEditText.setText(message);
                     onDownloadPress(null); // press download button
                 }
             });
@@ -268,8 +245,6 @@ public class PictureDownloader extends Activity {
                         .extend(new NotificationCompat.WearableExtender().setHintShowBackgroundOnly(true))
                         .build();
 
-
-
                 NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender()
                         .addPage(secondPage)
                         .setBackground(wearImage)
@@ -291,37 +266,24 @@ public class PictureDownloader extends Activity {
                     .setLabel("Any thoughts on this picture?")
                     .build();
 
-            Intent goodActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_LIKE).putExtra(RATING_ITEM, urlToRate);
-            Intent badActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_DISLIKE).putExtra(RATING_ITEM, urlToRate);
+            Intent likeActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_LIKE).putExtra(RATING_ITEM, urlToRate);
+            Intent dislikeActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_DISLIKE).putExtra(RATING_ITEM, urlToRate);
             Intent favoriteActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_FAVORITE).putExtra(RATING_ITEM, urlToRate);
             Intent commentActionIntent = new Intent(getApplicationContext(), PictureRatingService.class).putExtra(RATING, RATING_COMMENT).putExtra(RATING_ITEM, urlToRate);
-            PendingIntent goodActionPendingIntent = PendingIntent.getService(getApplicationContext(), 0, goodActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            PendingIntent badActionPendingIntent = PendingIntent.getService(getApplicationContext(), 1, badActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent likeActionPendingIntent = PendingIntent.getService(getApplicationContext(), 0, likeActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent dislikeActionPendingIntent = PendingIntent.getService(getApplicationContext(), 1, dislikeActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             PendingIntent favoriteActionPendingIntent = PendingIntent.getService(getApplicationContext(), 2, favoriteActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             PendingIntent commentActionPendingIntent = PendingIntent.getService(getApplicationContext(), 3, commentActionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            NotificationCompat.Action.Builder goodAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_good, "Good", goodActionPendingIntent);
-            NotificationCompat.Action.Builder badAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_bad, "Bad", badActionPendingIntent);
+            NotificationCompat.Action.Builder likeAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_good, "Like", likeActionPendingIntent);
+            NotificationCompat.Action.Builder dislikeAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_bad, "Dislike", dislikeActionPendingIntent);
             NotificationCompat.Action.Builder favoriteAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_favorite, "Favorite", favoriteActionPendingIntent);
             NotificationCompat.Action.Builder commentAction = new NotificationCompat.Action.Builder(R.drawable.ic_action_chat, "Comment", commentActionPendingIntent)
                     .addRemoteInput(remoteInput);
 
-            return Arrays.asList(goodAction.build(), badAction.build(), favoriteAction.build(), commentAction.build());
+            return Arrays.asList(likeAction.build(), dislikeAction.build(), favoriteAction.build(), commentAction.build());
         }
     }
-
-    /*private class PictureRatingServiceConnection implements ServiceConnection {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mRatingServiceBound = false;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mRatingService = ((PictureRatingService.RatingServiceBinder) service).getService();
-            mRatingServiceBound = true;
-        }
-    }*/
 
     private class WearableConnectionHandler implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 

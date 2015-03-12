@@ -7,8 +7,8 @@ public interface MessageHandler {
     /**
      * Handles processed messages from a wearable device.
      * A message is considered processed when it has been acted upon in the {@link MessageApi.MessageListener#onMessageReceived(com.google.android.gms.wearable.MessageEvent)} method.
-     * @param msg
+     * @param message
      */
-    void handleMessage(final String msg);
+    void handleStringMessage(final String message);
 
 }

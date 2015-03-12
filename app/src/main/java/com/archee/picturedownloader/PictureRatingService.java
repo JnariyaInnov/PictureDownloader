@@ -24,9 +24,6 @@ public class PictureRatingService extends IntentService {
 
     private PictureRatingRESTService mService;
 
-    // Binder given to clients
-    /*private final IBinder mBinder = new RatingServiceBinder();*/
-
     public PictureRatingService() {
         super(TAG);
     }
@@ -36,16 +33,11 @@ public class PictureRatingService extends IntentService {
         super.onCreate();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("http://192.168.1.115:3000")
+                .setEndpoint("https://shrouded-thicket-7737.herokuapp.com")
                 .build();
 
         mService = restAdapter.create(PictureRatingRESTService.class);
     }
-
-    /*@Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }*/
 
     @Override
     public void onHandleIntent(Intent intent) {
@@ -56,22 +48,23 @@ public class PictureRatingService extends IntentService {
             Callback<Response> cb = new Callback<Response>() {
                 @Override
                 public void success(Response response, Response response2) {
-                    Log.i(TAG, "Success! " + response);
+                    Log.i(TAG, "Success! Response code: " + response.getStatus());
+                    Log.i(TAG, response.getBody().toString());
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
-                    Log.i(TAG, "Fail! " + error);
+                    Log.e(TAG, "Fail! " + error);
                 }
             };
 
             // Would like to use switch statement here but my IntelliJ + MacOS are having issues with using JDK 7 and won't let me compile a string switch...
             if (rating.equals(RATING_LIKE)) {
-                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.LikeDislikeFavorite.LIKE), cb);
+                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.LIKE), cb);
             } else if (rating.equals(RATING_DISLIKE)) {
-                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.LikeDislikeFavorite.DISLIKE), cb);
+                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.DISLIKE), cb);
             } else if (rating.equals(RATING_FAVORITE)) {
-                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.LikeDislikeFavorite.FAVORITE), cb);
+                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.FAVORITE), cb);
             } else if (rating.equals(RATING_COMMENT)) {
                 Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
                 mService.createPictureReview(PictureRatingRequest.forCommentReview(url, remoteInput.getCharSequence(RATING_COMMENT).toString()), cb);
@@ -83,11 +76,4 @@ public class PictureRatingService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
     }
-
-    /*public class RatingServiceBinder extends Binder {
-        PictureRatingService getService() {
-            // Return this instance of PictureRatingService so clients can call public methods
-            return PictureRatingService.this;
-        }
-    }*/
 }

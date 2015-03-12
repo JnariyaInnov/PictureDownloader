@@ -27,7 +27,7 @@ public class SimpleEntryMessageListener implements MessageApi.MessageListener {
             final String entryStr = new String(payload);
             Log.i(TAG, "Received entry from wearable: " + entryStr);
 
-            mMessageHandler.handleMessage(entryStr);
+            mMessageHandler.handleStringMessage(entryStr);
         }
     }
 }

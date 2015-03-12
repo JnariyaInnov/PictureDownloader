@@ -12,12 +12,8 @@ public class PictureRatingRequest {
         this.comments = comments;
     }
 
-    public static final PictureRatingRequest forLikeDislikeReview(String pictureUrl, Rating.LikeDislikeFavorite ratingValue) {
-        return new PictureRatingRequest(pictureUrl, new Rating(ratingValue), null);
-    }
-
-    public static final PictureRatingRequest forStarsReview(String pictureUrl, Rating.Stars ratingValue) {
-        return new PictureRatingRequest(pictureUrl, new Rating(ratingValue), null);
+    public static final PictureRatingRequest forLikeDislikeReview(String pictureUrl, Rating rating) {
+        return new PictureRatingRequest(pictureUrl, rating, null);
     }
 
     public static final PictureRatingRequest forCommentReview(String pictureUrl, String comments) {
