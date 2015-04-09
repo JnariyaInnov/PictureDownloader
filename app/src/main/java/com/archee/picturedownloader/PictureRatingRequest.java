@@ -12,11 +12,19 @@ public class PictureRatingRequest {
         this.comments = comments;
     }
 
-    public static final PictureRatingRequest forLikeDislikeReview(String pictureUrl, Rating rating) {
-        return new PictureRatingRequest(pictureUrl, rating, null);
+    public static PictureRatingRequest forLikeReview(String pictureUrl) {
+        return new PictureRatingRequest(pictureUrl, Rating.LIKE, null);
     }
 
-    public static final PictureRatingRequest forCommentReview(String pictureUrl, String comments) {
+    public static PictureRatingRequest forDislikeReview(String pictureUrl) {
+        return new PictureRatingRequest(pictureUrl, Rating.DISLIKE, null);
+    }
+
+    public static PictureRatingRequest forFavoriteReview(String pictureUrl) {
+        return new PictureRatingRequest(pictureUrl, Rating.FAVORITE, null);
+    }
+
+    public static PictureRatingRequest forCommentReview(String pictureUrl, String comments) {
         return new PictureRatingRequest(pictureUrl, null, comments);
     }
 

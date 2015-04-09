@@ -60,11 +60,11 @@ public class PictureRatingService extends IntentService {
 
             // Would like to use switch statement here but my IntelliJ + MacOS are having issues with using JDK 7 and won't let me compile a string switch...
             if (rating.equals(RATING_LIKE)) {
-                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.LIKE), cb);
+                mService.createPictureReview(PictureRatingRequest.forLikeReview(url), cb);
             } else if (rating.equals(RATING_DISLIKE)) {
-                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.DISLIKE), cb);
+                mService.createPictureReview(PictureRatingRequest.forDislikeReview(url), cb);
             } else if (rating.equals(RATING_FAVORITE)) {
-                mService.createPictureReview(PictureRatingRequest.forLikeDislikeReview(url, Rating.FAVORITE), cb);
+                mService.createPictureReview(PictureRatingRequest.forFavoriteReview(url), cb);
             } else if (rating.equals(RATING_COMMENT)) {
                 Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
                 mService.createPictureReview(PictureRatingRequest.forCommentReview(url, remoteInput.getCharSequence(RATING_COMMENT).toString()), cb);
