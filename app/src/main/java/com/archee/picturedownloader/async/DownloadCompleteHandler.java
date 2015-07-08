@@ -1,6 +1,6 @@
 package com.archee.picturedownloader.async;
 
-public interface AsyncImageCallback {
+public interface DownloadCompleteHandler {
 
     void onDownloadComplete(ImageResponse response);
 
